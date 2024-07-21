@@ -66,6 +66,7 @@ int main(int argc, char** argv)
         for (;;) {
             wmove(stdscr, 0, 0);
             for (size_t i = 0; i < files.len; i++) {
+                // have a little cursor thingy
                 if (i == cursorline)
                     attron(A_STANDOUT);
 
@@ -92,13 +93,16 @@ int main(int argc, char** argv)
                 case '\n' : case KEY_ENTER: {
                     if (is_directory(files.ptr[cursorline]->d_name) 
                         && strcmp(".", files.ptr[cursorline]->d_name) != 0) {
-
+                        
+                        // we concatenate the new part.
+                        // worth mentioning that everything will work if you have .. or . in the path 
+                        // ex: /home/chloe/./../../etc/. will work, at least with stat(3) and opendir(3).
                         current_directory = concat_directory(current_directory, current_directory_len, files.ptr[cursorline]->d_name, true, &current_directory_len);
                         
                         goto change_directory;
                     }
                 } break;
-                
+
                 case 'q' : {
                     // quit the program :)
                     endwin();
@@ -135,9 +139,13 @@ bool is_directory(char* filename)
 
 int _dirent_name_cmp(const void* d1, const void* d2) 
 {
+    /*
+     * this function is for quicksort thats why it has all the weird void* nonsence
+     */
     char* s1 = (*(struct dirent**)d1)->d_name;
     char* s2 = (*(struct dirent**)d2)->d_name;
 
+    // I skip over the hidden file period when sorting, mostly becuase thats how ls does it
     if (*s1 == '.') s1++;
     if (*s2 == '.') s2++;
 
@@ -163,8 +171,8 @@ char* concat_directory(char* original_part, size_t original_size, char* to_conca
     /*
      * this function basically makes a new string with a format of this:
      * "<original part>/<to_concat>".
-     * I do this a lot in this function so
-     **/
+     * I do this a lot in a bunch of functions so
+     */
     size_t to_concat_len = strlen(to_concat);
     char* temp = malloc((original_size + to_concat_len + 2) * sizeof(char));
     CHECK_ALLOC(temp);
