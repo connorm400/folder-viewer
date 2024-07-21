@@ -1,4 +1,5 @@
 install:
+	mkdir .build
 	gcc -o ./.build/folderview main.c -lncurses
 
 run:

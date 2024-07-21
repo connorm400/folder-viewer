@@ -172,6 +172,8 @@ char* concat_directory(char* original_part, size_t original_size, char* to_conca
      * this function basically makes a new string with a format of this:
      * "<original part>/<to_concat>".
      * I do this a lot in a bunch of functions so
+     * it might also free the original_part string if free_original is set to true, and it will put the returned string length
+     *  in new_len_out if it isn't null.
      */
     size_t to_concat_len = strlen(to_concat);
     char* temp = malloc((original_size + to_concat_len + 2) * sizeof(char));
