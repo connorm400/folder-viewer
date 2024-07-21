@@ -40,6 +40,7 @@ int main(int argc, char** argv)
     initscr();
     keypad(stdscr, true);
     noecho();
+    curs_set(0);
 
     for (;;) {
         size_t cursorline = 0; // well make the lines start at 0 itll make things work better trust me take my hand
@@ -63,9 +64,9 @@ int main(int argc, char** argv)
 
         qsort(files.ptr, files.len, sizeof(struct dirent*), _dirent_name_cmp);
 
-        for (;;) {
+        for (;;) {            
             wmove(stdscr, 0, 0);
-            for (size_t i = 0; i < files.len; i++) {
+            for (size_t i = 0; i < files.len && i < getmaxx(stdscr)  - 1; i++) {
                 // have a little cursor thingy
                 if (i == cursorline)
                     attron(A_STANDOUT);
@@ -84,10 +85,12 @@ int main(int argc, char** argv)
             switch (ch) {
                 case KEY_UP: {
                     if (cursorline > 0) cursorline--;
+                    else cursorline = files.len-1;
                 } break;
 
                 case KEY_DOWN: {
                     if (cursorline < files.len - 1) cursorline++;
+                    else cursorline = 0;
                 } break;
 
                 case '\n' : case KEY_ENTER: {
